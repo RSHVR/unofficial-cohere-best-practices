@@ -67,6 +67,14 @@ Once installed, the skill activates when you mention Cohere, Command models, emb
 | `langgraph.md` | ReAct agents, memory, human-in-the-loop |
 | `cookbooks.md` | Curated official cookbook links |
 
+## Official Resources
+
+- [Cohere Documentation](https://docs.cohere.com)
+- [Cohere API Reference](https://docs.cohere.com/reference/about)
+- [Cohere Cookbooks](https://docs.cohere.com/page/cookbooks)
+- [Cohere Python SDK](https://github.com/cohere-ai/cohere-python)
+- [LangChain-Cohere](https://python.langchain.com/docs/integrations/providers/cohere/)
+
 ## License
 
 MIT
