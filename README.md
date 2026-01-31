@@ -1,0 +1,64 @@
+# Unofficial Cohere Best Practices
+
+A Claude Code skill providing best practices for Cohere's AI APIs.
+
+## What's Included
+
+- **Chat/Text Generation** - Command A, Command R+, Command R models
+- **Reasoning Model** - Command A Reasoning with `budget_tokens` control
+- **Vision Model** - Command A Vision for images + text
+- **Embeddings** - Embed v4 (multimodal, Matryoshka), v3 models
+- **Reranking** - Two-stage retrieval patterns with Rerank v4/v3.5
+- **Streaming** - All event types and patterns
+- **Structured Outputs** - JSON mode, JSON Schema, strict_tools
+- **RAG** - Document grounding with citations
+- **Tool Use** - Function calling patterns
+- **Agents** - LangGraph with create_cohere_react_agent
+
+Supports both native Cohere Python SDK (`cohere.ClientV2`) and LangChain/LangGraph integrations (`langchain-cohere`).
+
+## Installation
+
+```bash
+/install RSHVR/unofficial-cohere-best-practices
+```
+
+## Prerequisites
+
+Get your Cohere API key at https://dashboard.cohere.com
+
+Add to `~/.claude/settings.json`:
+```json
+{
+  "env": {
+    "CO_API_KEY": "your-api-key",
+    "COHERE_API_KEY": "your-api-key"
+  }
+}
+```
+
+## Usage
+
+Once installed, the skill activates when you mention Cohere, Command models, embeddings, reranking, or related concepts. It provides:
+
+- Current model recommendations (2025)
+- Code patterns for common tasks
+- Critical gotchas (like embedding input types)
+- Troubleshooting guides
+
+## Reference Files
+
+| File | Topics |
+|------|--------|
+| `native-sdk.md` | Chat, streaming, tool use, structured outputs, RAG |
+| `embeddings.md` | Embed v4/v3, input types, batch processing |
+| `rerank.md` | Reranking models, two-stage retrieval |
+| `streaming.md` | Event types, async patterns |
+| `structured-outputs.md` | JSON mode, schemas, strict_tools |
+| `langchain.md` | ChatCohere, CohereEmbeddings, CohereRerank |
+| `langgraph.md` | ReAct agents, memory, human-in-the-loop |
+| `cookbooks.md` | Curated official cookbook links |
+
+## License
+
+MIT
