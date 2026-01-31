@@ -24,17 +24,11 @@ A Claude Code skill providing best practices for Cohere's AI APIs across **Pytho
 
 ## Installation
 
-**One-liner (recommended):**
 ```bash
 npx skills add RSHVR/unofficial-cohere-best-practices
 ```
 
-**Or via Claude Code directly:**
-```bash
-/install RSHVR/unofficial-cohere-best-practices
-```
-
-Works with Claude Code, Cursor, OpenCode, Codex, and [36+ other agents](https://github.com/vercel-labs/skills).
+Works with Claude Code, Cursor, and other agents supporting the [Vercel Labs Skills](https://github.com/vercel-labs/skills) format.
 
 ## Prerequisites
 
