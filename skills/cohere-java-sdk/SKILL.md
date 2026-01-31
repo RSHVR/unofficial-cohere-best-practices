@@ -1,14 +1,14 @@
+---
+name: cohere-java-sdk
+description: Cohere Java SDK reference for chat, streaming, embeddings, reranking, and tool use. Use when building Java/Kotlin applications with Cohere APIs.
+---
+
 # Cohere Java SDK Reference
 
-## Table of Contents
-1. [Installation](#installation)
-2. [Client Setup](#client-setup)
-3. [Chat API](#chat-api)
-4. [Streaming](#streaming)
-5. [Embeddings](#embeddings)
-6. [Reranking](#reranking)
-7. [Tool Use](#tool-use)
-8. [Error Handling](#error-handling)
+## Official Resources
+
+- **Docs & Cookbooks**: https://github.com/cohere-ai/cohere-developer-experience
+- **API Reference**: https://docs.cohere.com/reference/about
 
 ## Installation
 
@@ -138,9 +138,6 @@ stream.forEach(event -> {
 
 ### Basic Embedding
 ```java
-import com.cohere.api.types.*;
-import com.cohere.api.requests.*;
-
 EmbedResponse response = cohere.v2().embed(
     V2EmbedRequest.builder()
         .model("embed-v4.0")
@@ -177,39 +174,9 @@ EmbedResponse queryResponse = cohere.v2().embed(
 );
 ```
 
-### Batch Processing
-```java
-public List<List<Double>> embedBatched(List<String> texts, int batchSize) {
-    List<List<Double>> allEmbeddings = new ArrayList<>();
-
-    for (int i = 0; i < texts.size(); i += batchSize) {
-        List<String> batch = texts.subList(i, Math.min(i + batchSize, texts.size()));
-
-        EmbedResponse response = cohere.v2().embed(
-            V2EmbedRequest.builder()
-                .model("embed-v4.0")
-                .texts(batch)
-                .inputType(EmbedInputType.SEARCH_DOCUMENT)
-                .embeddingTypes(List.of(EmbeddingType.FLOAT))
-                .build()
-        );
-
-        allEmbeddings.addAll(response.getEmbeddings().getFloat_());
-    }
-
-    return allEmbeddings;
-}
-
-// Usage: embedBatched(largeTextList, 96);
-```
-
 ## Reranking
 
-### Basic Reranking
 ```java
-import com.cohere.api.types.*;
-import com.cohere.api.requests.*;
-
 RerankResponse response = cohere.v2().rerank(
     V2RerankRequest.builder()
         .model("rerank-v4.0-pro")
@@ -229,34 +196,10 @@ for (RerankResponseResultsItem result : response.getResults()) {
 }
 ```
 
-### Two-Stage Retrieval
-```java
-// Stage 1: Fast retrieval with embeddings
-List<Document> candidates = vectorStore.similaritySearch(query, 30);
-
-// Stage 2: Precise reranking
-RerankResponse reranked = cohere.v2().rerank(
-    V2RerankRequest.builder()
-        .model("rerank-v4.0-pro")
-        .query(query)
-        .documents(candidates.stream()
-            .map(doc -> RerankRequestDocumentsItem.of(doc.getContent()))
-            .toList())
-        .topN(10)
-        .build()
-);
-
-List<Document> finalDocs = reranked.getResults().stream()
-    .map(r -> candidates.get(r.getIndex()))
-    .toList();
-```
-
 ## Tool Use
 
 ### Define Tools
 ```java
-import com.cohere.api.types.*;
-
 List<ToolV2> tools = List.of(
     ToolV2.builder()
         .type("function")
@@ -299,7 +242,6 @@ public String runWithTools(String userMessage) {
     while (response.getMessage().getToolCalls() != null
            && !response.getMessage().getToolCalls().isEmpty()) {
 
-        // Add assistant message
         messages.add(ChatMessageV2.assistant(
             AssistantMessage.builder()
                 .toolPlan(response.getMessage().getToolPlan())
@@ -307,7 +249,6 @@ public String runWithTools(String userMessage) {
                 .build()
         ));
 
-        // Execute tools
         for (ToolCallV2 tc : response.getMessage().getToolCalls()) {
             Map<String, Object> args = parseJson(tc.getFunction().getArguments());
             Object result = executeFunction(tc.getFunction().getName(), args);
@@ -326,7 +267,6 @@ public String runWithTools(String userMessage) {
             ));
         }
 
-        // Get next response
         response = cohere.v2().chat(
             V2ChatRequest.builder()
                 .model("command-a-03-2025")
@@ -353,10 +293,4 @@ try {
 } catch (Exception e) {
     System.err.println("Error: " + e.getMessage());
 }
-```
-
-## Environment Variables
-
-```bash
-export CO_API_KEY="your-api-key"
 ```

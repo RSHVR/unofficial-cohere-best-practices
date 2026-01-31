@@ -1,29 +1,25 @@
+---
+name: cohere-typescript-sdk
+description: Cohere TypeScript/JavaScript SDK reference for chat, streaming, embeddings, reranking, and tool use. Use when building Node.js or browser applications with Cohere APIs.
+---
+
 # Cohere TypeScript SDK Reference
 
-## Table of Contents
-1. [Installation](#installation)
-2. [Client Setup](#client-setup)
-3. [Chat API](#chat-api)
-4. [Streaming](#streaming)
-5. [Embeddings](#embeddings)
-6. [Reranking](#reranking)
-7. [Tool Use](#tool-use)
-8. [Structured Outputs](#structured-outputs)
-9. [Error Handling](#error-handling)
+## Official Resources
+
+- **Docs & Cookbooks**: https://github.com/cohere-ai/cohere-developer-experience
+- **API Reference**: https://docs.cohere.com/reference/about
 
 ## Installation
 
 ```bash
 npm install cohere-ai
-# or
-yarn add cohere-ai
-# or
-pnpm add cohere-ai
+# or yarn add cohere-ai
+# or pnpm add cohere-ai
 ```
 
 ## Client Setup
 
-### Basic Setup
 ```typescript
 import { CohereClientV2 } from "cohere-ai";
 
@@ -67,37 +63,22 @@ const response = await cohere.chat({
 });
 ```
 
-### Multi-turn Conversation
-```typescript
-const messages = [
-  { role: "user" as const, content: "My name is Veer" },
-  { role: "assistant" as const, content: "Nice to meet you, Veer!" },
-  { role: "user" as const, content: "What's my name?" }
-];
-
-const response = await cohere.chat({
-  model: "command-a-03-2025",
-  messages,
-});
-```
-
 ### Parameters
 ```typescript
 const response = await cohere.chat({
   model: "command-a-03-2025",
   messages: [{ role: "user", content: "Write a story" }],
-  temperature: 0.7,        // 0.0-1.0, higher = more creative
-  maxTokens: 500,          // Max response length
-  p: 0.9,                  // Top-p sampling
-  k: 50,                   // Top-k sampling
-  seed: 42,                // For reproducibility
-  stopSequences: ["END"],  // Stop generation at these
+  temperature: 0.7,
+  maxTokens: 500,
+  p: 0.9,
+  k: 50,
+  seed: 42,
+  stopSequences: ["END"],
 });
 ```
 
 ## Streaming
 
-### Basic Streaming
 ```typescript
 const stream = await cohere.chatStream({
   model: "command-a-03-2025",
@@ -107,47 +88,6 @@ const stream = await cohere.chatStream({
 for await (const event of stream) {
   if (event.type === "content-delta") {
     process.stdout.write(event.delta?.message?.content?.text ?? "");
-  }
-}
-```
-
-### Streaming Event Types
-```typescript
-const stream = await cohere.chatStream({
-  model: "command-a-03-2025",
-  messages,
-});
-
-for await (const event of stream) {
-  switch (event.type) {
-    case "message-start":
-      console.log("Generation started");
-      break;
-    case "content-start":
-      console.log("Content block started");
-      break;
-    case "content-delta":
-      process.stdout.write(event.delta?.message?.content?.text ?? "");
-      break;
-    case "content-end":
-      console.log("\nContent block ended");
-      break;
-    case "message-end":
-      console.log("Generation complete");
-      // Access final response: event.response
-      break;
-    case "tool-plan-delta":
-      console.log(`Tool plan: ${event.delta?.message?.toolPlan}`);
-      break;
-    case "tool-call-start":
-      console.log("Tool call started");
-      break;
-    case "tool-call-delta":
-      console.log("Tool args delta");
-      break;
-    case "tool-call-end":
-      console.log("Tool call complete");
-      break;
   }
 }
 ```
@@ -164,18 +104,6 @@ const response = await cohere.embed({
 });
 
 const embeddings = response.embeddings.float;
-console.log(`Embedding dimensions: ${embeddings[0].length}`);
-```
-
-### With Matryoshka Dimensions (Embed v4)
-```typescript
-const response = await cohere.embed({
-  model: "embed-v4.0",
-  texts: ["Your text here"],
-  inputType: "search_document",
-  embeddingTypes: ["float"],
-  outputDimension: 512,  // Options: 256, 512, 1024, 1536
-});
 ```
 
 ### Input Types (CRITICAL)
@@ -219,15 +147,14 @@ async function embedBatched(texts: string[], batchSize = 96): Promise<number[][]
 
 ## Reranking
 
-### Basic Reranking
 ```typescript
 const response = await cohere.rerank({
   model: "rerank-v4.0-pro",
   query: "What is machine learning?",
   documents: [
-    "Machine learning is a subset of AI that enables systems to learn from data.",
-    "The weather today is sunny with clear skies.",
-    "Deep learning uses neural networks with many layers.",
+    "Machine learning is a subset of AI...",
+    "The weather today is sunny...",
+    "Deep learning uses neural networks...",
   ],
   topN: 3,
 });
@@ -235,22 +162,6 @@ const response = await cohere.rerank({
 for (const result of response.results) {
   console.log(`Index: ${result.index}, Score: ${result.relevanceScore}`);
 }
-```
-
-### Two-Stage Retrieval Pattern
-```typescript
-// Stage 1: Fast retrieval with embeddings
-const candidates = await vectorStore.similaritySearch(query, 30);
-
-// Stage 2: Precise reranking
-const reranked = await cohere.rerank({
-  model: "rerank-v4.0-pro",
-  query,
-  documents: candidates.map(doc => doc.content),
-  topN: 10,
-});
-
-const finalDocs = reranked.results.map(r => candidates[r.index]);
 ```
 
 ## Tool Use
@@ -277,7 +188,6 @@ const tools = [
   },
 ];
 
-// Tool implementation
 const functionsMap: Record<string, (args: any) => any> = {
   get_weather: ({ location }) => ({
     temperature: "20°C",
@@ -303,14 +213,12 @@ async function runWithTools(userMessage: string) {
   });
 
   while (response.message.toolCalls && response.message.toolCalls.length > 0) {
-    // Add assistant message with tool calls
     messages.push({
       role: "assistant",
       toolPlan: response.message.toolPlan,
       toolCalls: response.message.toolCalls,
     });
 
-    // Execute tools and add results
     for (const tc of response.message.toolCalls) {
       const args = JSON.parse(tc.function.arguments ?? "{}");
       const result = functionsMap[tc.function.name](args);
@@ -327,7 +235,6 @@ async function runWithTools(userMessage: string) {
       });
     }
 
-    // Get next response
     response = await cohere.chat({
       model: "command-a-03-2025",
       messages,
@@ -340,19 +247,6 @@ async function runWithTools(userMessage: string) {
 ```
 
 ## Structured Outputs
-
-### JSON Mode
-```typescript
-const response = await cohere.chat({
-  model: "command-a-03-2025",
-  messages: [
-    { role: "user", content: "Generate a JSON with name and age for a person" }
-  ],
-  responseFormat: { type: "json_object" },
-});
-
-const data = JSON.parse(response.message.content[0].text);
-```
 
 ### JSON Schema Mode
 ```typescript
@@ -372,16 +266,6 @@ const response = await cohere.chat({
       required: ["name", "age"],
     },
   },
-});
-```
-
-### Strict Tools
-```typescript
-const response = await cohere.chat({
-  model: "command-a-03-2025",
-  messages,
-  tools,
-  strictTools: true,  // Guarantees tool calls match schema exactly
 });
 ```
 
@@ -406,27 +290,17 @@ try {
 }
 ```
 
-## Environment Variables
-
-```bash
-export CO_API_KEY="your-api-key"
-```
-
 ## Vercel AI SDK Integration
-
-If using Vercel AI SDK, use `@ai-sdk/cohere`:
 
 ```typescript
 import { cohere } from "@ai-sdk/cohere";
 import { generateText, embed } from "ai";
 
-// Chat
 const { text } = await generateText({
   model: cohere("command-a-03-2025"),
   prompt: "Hello!",
 });
 
-// Embeddings
 const { embedding } = await embed({
   model: cohere.embedding("embed-v4.0"),
   value: "Your text here",

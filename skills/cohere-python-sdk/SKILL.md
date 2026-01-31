@@ -1,4 +1,14 @@
+---
+name: cohere-python-sdk
+description: Cohere Python SDK reference for chat, streaming, tool use, structured outputs, and RAG. Use when building Python applications with Cohere's Command models, embeddings, or reranking APIs.
+---
+
 # Cohere Native Python SDK Reference
+
+## Official Resources
+
+- **Docs & Cookbooks**: https://github.com/cohere-ai/cohere-developer-experience
+- **API Reference**: https://docs.cohere.com/reference/about
 
 ## Table of Contents
 1. [Client Setup](#client-setup)
@@ -117,39 +127,6 @@ response = co.chat(
 )
 ```
 
-### Token Budget Control
-```python
-# Low budget = faster, less thorough
-response = co.chat(
-    model="command-a-reasoning-2025",
-    messages=messages,
-    thinking={"type": "enabled", "budget_tokens": 1024}  # Minimum budget
-)
-
-# High budget = slower, more thorough
-response = co.chat(
-    model="command-a-reasoning-2025", 
-    messages=messages,
-    thinking={"type": "enabled", "budget_tokens": 16000}  # Deep reasoning
-)
-```
-
-### Access Thinking Output
-```python
-response = co.chat(
-    model="command-a-reasoning-2025",
-    messages=[{"role": "user", "content": "Complex reasoning task..."}],
-    thinking={"type": "enabled", "budget_tokens": 8000}
-)
-
-# The thinking process may be accessible depending on API version
-# Check response structure for thinking content
-for content in response.message.content:
-    if hasattr(content, 'type'):
-        print(f"Type: {content.type}")
-    print(content.text)
-```
-
 ## Streaming
 
 ### Basic Streaming
@@ -170,38 +147,25 @@ for event in co.chat_stream(model="command-a-03-2025", messages=messages):
     match event.type:
         case "message-start":
             print("Generation started")
-        case "content-start":
-            print("Content block started")
         case "content-delta":
             print(event.delta.message.content.text, end="")
-        case "content-end":
-            print("\nContent block ended")
         case "message-end":
             print("Generation complete")
-            # Access final response: event.response
         case "tool-plan-delta":
             print(f"Tool plan: {event.delta.message.tool_plan}")
         case "tool-call-start":
             print(f"Tool call started: {event.delta.message.tool_calls}")
-        case "tool-call-delta":
-            print(f"Tool args: {event.delta.message.tool_calls}")
-        case "tool-call-end":
-            print("Tool call complete")
 ```
 
 ## Tool Use / Function Calling
 
 ### Step 1: Define Tools
 ```python
-# The actual function
 def get_weather(location: str) -> dict:
-    # Your implementation here
     return {"temperature": "20°C", "condition": "sunny"}
 
-# Map function names to functions
 functions_map = {"get_weather": get_weather}
 
-# Tool schema for the API
 tools = [
     {
         "type": "function",
@@ -223,175 +187,42 @@ tools = [
 ]
 ```
 
-### Step 2: Generate Tool Calls
+### Step 2: Generate and Execute Tool Calls
 ```python
 import json
 
 messages = [{"role": "user", "content": "What's the weather in Toronto?"}]
 
-response = co.chat(
-    model="command-a-03-2025",
-    messages=messages,
-    tools=tools
-)
+response = co.chat(model="command-a-03-2025", messages=messages, tools=tools)
 
-# Check if model wants to call tools
 if response.message.tool_calls:
-    # Add assistant message with tool calls
     messages.append({
         "role": "assistant",
         "tool_plan": response.message.tool_plan,
         "tool_calls": response.message.tool_calls
     })
-```
 
-### Step 3: Execute Tools and Return Results
-```python
-for tc in response.message.tool_calls:
-    # Execute the function
-    args = json.loads(tc.function.arguments)
-    result = functions_map[tc.function.name](**args)
-    
-    # Format result as document
-    messages.append({
-        "role": "tool",
-        "tool_call_id": tc.id,
-        "content": [
-            {
-                "type": "document",
-                "document": {"data": json.dumps(result)}
-            }
-        ]
-    })
-```
+    for tc in response.message.tool_calls:
+        args = json.loads(tc.function.arguments)
+        result = functions_map[tc.function.name](**args)
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tc.id,
+            "content": [{"type": "document", "document": {"data": json.dumps(result)}}]
+        })
 
-### Step 4: Generate Final Response
-```python
-final_response = co.chat(
-    model="command-a-03-2025",
-    messages=messages,
-    tools=tools
-)
+final_response = co.chat(model="command-a-03-2025", messages=messages, tools=tools)
 print(final_response.message.content[0].text)
-
-# Citations are included automatically
-for citation in final_response.message.citations or []:
-    print(f"Citation: '{citation.text}' from {citation.sources}")
 ```
 
-### Controlling Tool Behavior with tool_choice
+### Controlling Tool Behavior
 ```python
-# Force the model to use tools (never respond directly)
 response = co.chat(
     model="command-a-03-2025",
     messages=messages,
     tools=tools,
-    tool_choice="REQUIRED"  # Must call at least one tool
+    tool_choice="REQUIRED"  # Must call tool. Options: AUTO, REQUIRED, NONE
 )
-
-# Force the model to NOT use tools (respond directly)
-response = co.chat(
-    model="command-a-03-2025",
-    messages=messages,
-    tools=tools,
-    tool_choice="NONE"  # Ignore tools, respond directly
-)
-
-# Let model decide (default behavior)
-response = co.chat(
-    model="command-a-03-2025",
-    messages=messages,
-    tools=tools,
-    tool_choice="AUTO"  # Model decides whether to use tools
-)
-```
-
-### Complete Tool Use Example
-```python
-import cohere
-import json
-
-co = cohere.ClientV2()
-
-def search_database(query: str) -> list:
-    return [
-        {"id": 1, "title": "Result 1", "content": "..."},
-        {"id": 2, "title": "Result 2", "content": "..."}
-    ]
-
-tools = [{
-    "type": "function",
-    "function": {
-        "name": "search_database",
-        "description": "Search internal database",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "Search query"}
-            },
-            "required": ["query"]
-        }
-    }
-}]
-
-def run_tool_use(user_message: str):
-    messages = [{"role": "user", "content": user_message}]
-    
-    response = co.chat(model="command-a-03-2025", messages=messages, tools=tools)
-    
-    while response.message.tool_calls:
-        messages.append({
-            "role": "assistant",
-            "tool_plan": response.message.tool_plan,
-            "tool_calls": response.message.tool_calls
-        })
-        
-        for tc in response.message.tool_calls:
-            args = json.loads(tc.function.arguments)
-            result = search_database(**args)
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tc.id,
-                "content": [{"type": "document", "document": {"data": json.dumps(result)}}]
-            })
-        
-        response = co.chat(model="command-a-03-2025", messages=messages, tools=tools)
-    
-    return response.message.content[0].text
-```
-
-## Multi-step Tool Use (Agents)
-
-For complex queries, the model may need multiple tool calls in sequence:
-
-```python
-def run_agent(user_message: str, max_steps: int = 10):
-    messages = [{"role": "user", "content": user_message}]
-    
-    for step in range(max_steps):
-        response = co.chat(model="command-a-03-2025", messages=messages, tools=tools)
-        
-        if not response.message.tool_calls:
-            # No more tool calls, return final response
-            return response.message.content[0].text
-        
-        # Process tool calls
-        messages.append({
-            "role": "assistant",
-            "tool_plan": response.message.tool_plan,
-            "tool_calls": response.message.tool_calls
-        })
-        
-        for tc in response.message.tool_calls:
-            args = json.loads(tc.function.arguments)
-            result = functions_map[tc.function.name](**args)
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tc.id,
-                "content": [{"type": "document", "document": {"data": json.dumps(result)}}]
-            })
-    
-    return "Max steps reached"
 ```
 
 ## Structured Outputs
@@ -403,7 +234,6 @@ response = co.chat(
     messages=[{"role": "user", "content": "List 3 fruits as JSON"}],
     response_format={"type": "json_object"}
 )
-# Response will be valid JSON
 ```
 
 ### JSON Schema
@@ -427,27 +257,16 @@ response = co.chat(
 
 ### Strict Tool Parameters
 ```python
-# Guarantees tool calls match schema exactly (no hallucinated params)
 response = co.chat(
     model="command-a-03-2025",
     messages=[{"role": "user", "content": "..."}],
     tools=tools,
     strict_tools=True  # Eliminates tool name/param hallucinations
 )
-# Note: strict_tools requires at least one required parameter per tool
-# Max 200 fields across all tools in a single call
 ```
-
-### When to Use What
-| Feature | Use Case |
-|---------|----------|
-| `response_format={"type": "json_object"}` | Simple JSON output, model determines structure |
-| `response_format` with `json_schema` | Guaranteed schema compliance for text generation |
-| `strict_tools=True` | Guaranteed schema compliance for tool/function calls |
 
 ## RAG with Documents
 
-### Inline Documents
 ```python
 documents = [
     {"id": "doc1", "data": {"title": "Report", "text": "Q3 revenue was $10M"}},
@@ -460,7 +279,6 @@ response = co.chat(
     documents=documents
 )
 
-# Citations reference document IDs
 for citation in response.message.citations or []:
     print(f"'{citation.text}' cited from {citation.sources}")
 ```

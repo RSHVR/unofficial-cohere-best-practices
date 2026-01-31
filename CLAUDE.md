@@ -4,91 +4,70 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project summary
 
-Unofficial best practices for Cohere's AI APIs. Covers chat, embeddings, reranking, streaming, structured outputs, RAG, tool use, and agents. Supports both native Cohere Python SDK (`cohere.ClientV2`) and LangChain/LangGraph integrations.
+Agent Skills is a collection of skills for AI coding assistants working with Cohere's AI APIs. The skills provide focused, actionable reference documentation for chat, embeddings, reranking, streaming, and agent workflows. Skills follow the [Agent Skills specification](https://agentskills.io/specification).
 
 ## Quick reference
 
-### Skill location
+### Available skills
 
 | Skill | Location | Triggers |
 |-------|----------|----------|
-| cohere | `skills/cohere/` | "Cohere", "Command A", "Command R", "embed", "rerank", "ChatCohere", "CohereEmbeddings" |
+| cohere-python-sdk | `skills/cohere-python-sdk/` | "cohere python", "cohere sdk", "ClientV2" |
+| cohere-typescript-sdk | `skills/cohere-typescript-sdk/` | "cohere typescript", "cohere js" |
+| cohere-java-sdk | `skills/cohere-java-sdk/` | "cohere java", "cohere maven" |
+| cohere-go-sdk | `skills/cohere-go-sdk/` | "cohere go", "cohere golang" |
+| cohere-embeddings | `skills/cohere-embeddings/` | "embed", "embeddings", "vector search" |
+| cohere-rerank | `skills/cohere-rerank/` | "rerank", "reranking", "two-stage retrieval" |
+| cohere-streaming | `skills/cohere-streaming/` | "stream", "streaming", "real-time" |
+| cohere-structured-outputs | `skills/cohere-structured-outputs/` | "json mode", "structured output", "schema" |
+| cohere-langchain | `skills/cohere-langchain/` | "langchain", "ChatCohere", "CohereEmbeddings" |
+| cohere-langgraph | `skills/cohere-langgraph/` | "langgraph", "react agent", "agent memory" |
+| cohere-cookbooks | `skills/cohere-cookbooks/` | "cookbook", "tutorial", "example" |
+| cohere-best-practices | `skills/cohere-best-practices/` | "best practices", "production", "optimization" |
 
-### Key models (2025)
+### Key patterns
 
-| Use Case | Model | Notes |
-|----------|-------|-------|
-| Chat | `command-a-03-2025` | Best overall, 256K context |
-| Reasoning | `command-a-reasoning-08-2025` | Use `thinking.budget_tokens` |
-| Vision | `command-a-vision-07-2025` | Native SDK only |
-| Embeddings | `embed-v4.0` | Multimodal, Matryoshka dims |
-| Rerank | `rerank-v4.0-pro` | 32K context |
+**API Client:**
+- Always use `cohere.ClientV2()` (not the deprecated `Client()`)
 
-### Critical gotchas
+**Embeddings:**
+- Use `input_type="search_document"` when indexing
+- Use `input_type="search_query"` when querying
+- Mismatch degrades search quality significantly
 
-1. **Embedding input types (MUST get right):**
-   - `input_type="search_document"` for storing docs
-   - `input_type="search_query"` for user queries
-   - Mixing these = poor search results
+**Two-Stage Retrieval:**
+1. Embeddings for broad recall (k=30)
+2. Reranking for precision (top_n=5-10)
 
-2. **Batch limits:**
-   - Embeddings: 96 items per request (hard limit)
-   - Rerank: 1,000 recommended (10K max)
-
-3. **API version:**
-   - Use `ClientV2()` not `Client()`
-   - Tool results need document format with `tool_call_id`
-
-4. **LangChain compatibility:**
-   - Reasoning and Vision models NOT supported in LangChain
-   - Use native SDK for these
-
-## Reference files
-
-| File | Topics |
-|------|--------|
-| `python-sdk.md` | Chat, streaming, tool use, structured outputs, RAG |
-| `embeddings.md` | Embed v4/v3, input types, batch processing |
-| `rerank.md` | Reranking models, two-stage retrieval |
-| `streaming.md` | Event types, async patterns |
-| `structured-outputs.md` | JSON mode, schemas, strict_tools |
-| `langchain.md` | ChatCohere, CohereEmbeddings, CohereRerank |
-| `langgraph.md` | ReAct agents, memory, human-in-the-loop |
-| `cookbooks.md` | Curated official cookbook links |
+**Agent Temperature:**
+- Use `temperature=0.3` for reliable tool calling
 
 ## Common tasks
 
-### Basic chat
-```python
-import cohere
-co = cohere.ClientV2()
-response = co.chat(
-    model="command-a-03-2025",
-    messages=[{"role": "user", "content": "Hello!"}]
-)
-print(response.message.content[0].text)
-```
+### Adding a new skill
 
-### Embeddings
-```python
-# For STORING documents
-co.embed(model="embed-v4.0", texts=docs, input_type="search_document")
+1. Create directory: `skills/{skill-name}/`
+2. Create `SKILL.md` with YAML frontmatter
+3. Add optional `scripts/`, `references/`, `assets/`
+4. Update `README.md` skills table
 
-# For QUERYING
-co.embed(model="embed-v4.0", texts=[query], input_type="search_query")
-```
+### Updating a skill
 
-### Two-stage retrieval
-```python
-# Stage 1: Fast retrieval
-candidates = vectorstore.similarity_search(query, k=30)
+1. Edit relevant `SKILL.md` file
+2. Keep focused and actionable
+3. Link to official docs for detailed content
+4. Include working code examples
 
-# Stage 2: Precise reranking
-reranked = co.rerank(model="rerank-v4.0-pro", query=query, documents=candidates, top_n=10)
-```
+## Code style
 
-## Dependencies
+- Use kebab-case for directories
+- YAML frontmatter required on all SKILL.md files
+- Include "Official Resources" section linking to Cohere docs
+- Code examples should be copy-paste ready
+- Always show imports in examples
 
-- `cohere` (v5+) - Native SDK
-- `langchain-cohere` (v0.5+) - LangChain integration
-- `langgraph` - For agents
+## External resources
+
+- **Official Docs**: https://docs.cohere.com/reference/about
+- **Cookbooks**: https://github.com/cohere-ai/cohere-developer-experience
+- **Dashboard**: https://dashboard.cohere.com

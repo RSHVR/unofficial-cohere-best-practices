@@ -1,87 +1,109 @@
-# Unofficial Cohere Best Practices
+# Agent Skills
 
-A Claude Code skill providing best practices for Cohere's AI APIs across **Python**, **TypeScript**, **Java**, and **Go**.
+A collection of agent skills for AI coding assistants. Each skill provides focused, actionable reference documentation for specific tools, frameworks, and APIs.
 
-## What's Included
+## Structure
 
-### Features
-- **Chat/Text Generation** - Command A, Command R+, Command R models
-- **Reasoning Model** - Command A Reasoning with `budget_tokens` control
-- **Vision Model** - Command A Vision for images + text
-- **Embeddings** - Embed v4 (multimodal, Matryoshka), v3 models
-- **Reranking** - Two-stage retrieval patterns with Rerank v4/v3.5
-- **Streaming** - All event types and patterns
-- **Structured Outputs** - JSON mode, JSON Schema, strict_tools
-- **RAG** - Document grounding with citations
-- **Tool Use** - Function calling patterns
-- **Agents** - LangGraph with create_cohere_react_agent
-
-### Languages & Frameworks
-- **Python** - Native SDK (`cohere.ClientV2`) + LangChain/LangGraph
-- **TypeScript** - Native SDK (`cohere-ai`)
-- **Java** - Native SDK (`cohere-java`)
-- **Go** - Native SDK (`cohere-go`)
-
-## Installation
-
-```bash
-npx skills add RSHVR/unofficial-cohere-best-practices
+```
+agent-skills/
+├── skills/
+│   ├── cohere-python-sdk/
+│   │   └── SKILL.md
+│   ├── cohere-typescript-sdk/
+│   │   └── SKILL.md
+│   ├── cohere-java-sdk/
+│   │   └── SKILL.md
+│   ├── cohere-go-sdk/
+│   │   └── SKILL.md
+│   ├── cohere-embeddings/
+│   │   └── SKILL.md
+│   ├── cohere-rerank/
+│   │   └── SKILL.md
+│   ├── cohere-streaming/
+│   │   └── SKILL.md
+│   ├── cohere-structured-outputs/
+│   │   └── SKILL.md
+│   ├── cohere-langchain/
+│   │   └── SKILL.md
+│   ├── cohere-langgraph/
+│   │   └── SKILL.md
+│   ├── cohere-cookbooks/
+│   │   └── SKILL.md
+│   └── cohere-best-practices/
+│       └── SKILL.md
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
-Works with Claude Code, Cursor, and other agents supporting the [Vercel Labs Skills](https://github.com/vercel-labs/skills) format.
+## Available Skills
 
-## Prerequisites
+### Cohere SDK Skills
+| Skill | Description |
+|-------|-------------|
+| `cohere-python-sdk` | Python SDK patterns for chat, embeddings, reranking, and tool use |
+| `cohere-typescript-sdk` | TypeScript SDK with Vercel AI SDK integration |
+| `cohere-java-sdk` | Java SDK with builder patterns and Maven/Gradle setup |
+| `cohere-go-sdk` | Go SDK with idiomatic patterns |
 
-Get your Cohere API key at https://dashboard.cohere.com
+### Cohere Feature Skills
+| Skill | Description |
+|-------|-------------|
+| `cohere-embeddings` | Asymmetric embeddings, input types, and vector search |
+| `cohere-rerank` | Two-stage retrieval and semantic reranking |
+| `cohere-streaming` | Real-time streaming with all event types |
+| `cohere-structured-outputs` | JSON mode, schemas, and strict tool parameters |
 
-Add to `~/.claude/settings.json`:
-```json
-{
-  "env": {
-    "CO_API_KEY": "your-api-key",
-    "COHERE_API_KEY": "your-api-key"
-  }
-}
-```
+### Cohere Integration Skills
+| Skill | Description |
+|-------|-------------|
+| `cohere-langchain` | ChatCohere, CohereEmbeddings, CohereRerank, RAG chains |
+| `cohere-langgraph` | ReAct agents, memory, human-in-the-loop patterns |
+
+### Reference Skills
+| Skill | Description |
+|-------|-------------|
+| `cohere-cookbooks` | Links to official Cohere cookbooks and tutorials |
+| `cohere-best-practices` | Production patterns and configuration guidelines |
 
 ## Usage
 
-Once installed, the skill activates when you mention Cohere, Command models, embeddings, reranking, or related concepts. It provides:
+### With Claude Code
 
-- Current model recommendations (2025)
-- Code patterns for common tasks
-- Critical gotchas (like embedding input types)
-- Troubleshooting guides
+Add a skill to your project's `.claude/skills/` directory:
 
-## Reference Files
+```bash
+cp -r skills/cohere-python-sdk ~/.claude/skills/
+```
 
-### By Language
-| File | Language | Topics |
-|------|----------|--------|
-| `python-sdk.md` | Python | Chat, streaming, tool use, structured outputs, RAG |
-| `typescript-sdk.md` | TypeScript | Chat, streaming, embeddings, rerank, tool use |
-| `java-sdk.md` | Java | Chat, streaming, embeddings, rerank, tool use |
-| `go-sdk.md` | Go | Chat, streaming, embeddings, rerank, tool use |
+### Skill Format
 
-### By Feature
-| File | Topics |
-|------|--------|
-| `embeddings.md` | Embed v4/v3, input types, batch processing |
-| `rerank.md` | Reranking models, two-stage retrieval |
-| `streaming.md` | Event types, async patterns |
-| `structured-outputs.md` | JSON mode, schemas, strict_tools |
-| `langchain.md` | ChatCohere, CohereEmbeddings, CohereRerank |
-| `langgraph.md` | ReAct agents, memory, human-in-the-loop |
-| `cookbooks.md` | Curated official cookbook links |
+Each skill follows the [Agent Skills specification](https://docs.anthropic.com/en/docs/agent-skills):
 
-## Official Resources
+```
+my-skill/
+├── SKILL.md          # Required: instructions + metadata
+├── scripts/          # Optional: executable code
+├── references/       # Optional: documentation
+└── assets/           # Optional: templates, resources
+```
 
-- [Cohere Documentation](https://docs.cohere.com)
-- [Cohere API Reference](https://docs.cohere.com/reference/about)
-- [Cohere Cookbooks](https://docs.cohere.com/page/cookbooks)
-- [Cohere Python SDK](https://github.com/cohere-ai/cohere-python)
-- [LangChain-Cohere](https://python.langchain.com/docs/integrations/providers/cohere/)
+SKILL.md files include YAML frontmatter:
+
+```yaml
+---
+name: skill-name
+description: Brief description of the skill
+---
+```
+
+## Contributing
+
+1. Create a new directory under `skills/`
+2. Add a `SKILL.md` file with frontmatter
+3. Include actionable code examples
+4. Link to official documentation
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE)

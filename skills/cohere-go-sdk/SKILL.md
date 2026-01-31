@@ -1,14 +1,14 @@
+---
+name: cohere-go-sdk
+description: Cohere Go SDK reference for chat, streaming, embeddings, reranking, and tool use. Use when building Go applications with Cohere APIs.
+---
+
 # Cohere Go SDK Reference
 
-## Table of Contents
-1. [Installation](#installation)
-2. [Client Setup](#client-setup)
-3. [Chat API](#chat-api)
-4. [Streaming](#streaming)
-5. [Embeddings](#embeddings)
-6. [Reranking](#reranking)
-7. [Tool Use](#tool-use)
-8. [Error Handling](#error-handling)
+## Official Resources
+
+- **Docs & Cookbooks**: https://github.com/cohere-ai/cohere-developer-experience
+- **API Reference**: https://docs.cohere.com/reference/about
 
 ## Installation
 
@@ -23,8 +23,6 @@ package main
 
 import (
     "context"
-    "os"
-
     cohere "github.com/cohere-ai/cohere-go/v2"
     client "github.com/cohere-ai/cohere-go/v2/client"
 )
@@ -50,10 +48,6 @@ func main() {
 
 ### Basic Chat
 ```go
-import (
-    cohere "github.com/cohere-ai/cohere-go/v2"
-)
-
 ctx := context.Background()
 
 response, err := co.V2.Chat(ctx, &cohere.V2ChatRequest{
@@ -191,40 +185,8 @@ queryResponse, err := co.V2.Embed(ctx, &cohere.V2EmbedRequest{
 })
 ```
 
-### Batch Processing
-```go
-func embedBatched(ctx context.Context, co *client.Client, texts []string, batchSize int) ([][]float64, error) {
-    var allEmbeddings [][]float64
-
-    for i := 0; i < len(texts); i += batchSize {
-        end := i + batchSize
-        if end > len(texts) {
-            end = len(texts)
-        }
-        batch := texts[i:end]
-
-        response, err := co.V2.Embed(ctx, &cohere.V2EmbedRequest{
-            Model:          "embed-v4.0",
-            Texts:          batch,
-            InputType:      cohere.EmbedInputTypeSearchDocument.Ptr(),
-            EmbeddingTypes: []cohere.EmbeddingType{cohere.EmbeddingTypeFloat},
-        })
-        if err != nil {
-            return nil, err
-        }
-
-        allEmbeddings = append(allEmbeddings, response.Embeddings.Float...)
-    }
-
-    return allEmbeddings, nil
-}
-
-// Usage: embedBatched(ctx, co, largeTextSlice, 96)
-```
-
 ## Reranking
 
-### Basic Reranking
 ```go
 topN := 3
 
@@ -244,33 +206,6 @@ if err != nil {
 
 for _, result := range response.Results {
     fmt.Printf("Index: %d, Score: %.4f\n", result.Index, result.RelevanceScore)
-}
-```
-
-### Two-Stage Retrieval
-```go
-// Stage 1: Fast retrieval with embeddings
-candidates, _ := vectorStore.SimilaritySearch(query, 30)
-
-// Stage 2: Precise reranking
-docs := make([]*cohere.RerankRequestDocumentsItem, len(candidates))
-for i, c := range candidates {
-    docs[i] = &cohere.RerankRequestDocumentsItem{
-        String: cohere.String(c.Content),
-    }
-}
-
-topN := 10
-reranked, err := co.V2.Rerank(ctx, &cohere.V2RerankRequest{
-    Model:     "rerank-v4.0-pro",
-    Query:     query,
-    Documents: docs,
-    TopN:      &topN,
-})
-
-finalDocs := make([]Document, len(reranked.Results))
-for i, r := range reranked.Results {
-    finalDocs[i] = candidates[r.Index]
 }
 ```
 
@@ -295,16 +230,6 @@ tools := []*cohere.ToolV2{
                 "required": []string{"location"},
             },
         },
-    },
-}
-
-functionsMap := map[string]func(map[string]interface{}) interface{}{
-    "get_weather": func(args map[string]interface{}) interface{} {
-        return map[string]string{
-            "temperature": "20°C",
-            "condition":   "sunny",
-            "location":    args["location"].(string),
-        }
     },
 }
 ```
@@ -333,7 +258,6 @@ func runWithTools(ctx context.Context, co *client.Client, userMessage string) (s
     }
 
     for len(response.Message.ToolCalls) > 0 {
-        // Add assistant message
         messages = append(messages, &cohere.ChatMessageV2{
             Role: "assistant",
             Assistant: &cohere.AssistantMessage{
@@ -342,7 +266,6 @@ func runWithTools(ctx context.Context, co *client.Client, userMessage string) (s
             },
         })
 
-        // Execute tools
         for _, tc := range response.Message.ToolCalls {
             var args map[string]interface{}
             json.Unmarshal([]byte(*tc.Function.Arguments), &args)
@@ -366,7 +289,6 @@ func runWithTools(ctx context.Context, co *client.Client, userMessage string) (s
             })
         }
 
-        // Get next response
         response, err = co.V2.Chat(ctx, &cohere.V2ChatRequest{
             Model:    "command-a-03-2025",
             Messages: messages,
@@ -399,10 +321,4 @@ if err != nil {
     }
     return
 }
-```
-
-## Environment Variables
-
-```bash
-export CO_API_KEY="your-api-key"
 ```
