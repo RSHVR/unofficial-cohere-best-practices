@@ -68,41 +68,25 @@ agent-skills/
 
 ## Usage
 
-### With Claude Code
+### With npx skills (Recommended)
+
+```bash
+npx skills add RSHVR/unofficial-cohere-best-practices
+```
+
+Install a specific skill:
+
+```bash
+npx skills add RSHVR/unofficial-cohere-best-practices --skill cohere-python-sdk
+```
+
+### Manual Installation
 
 Add a skill to your project's `.claude/skills/` directory:
 
 ```bash
 cp -r skills/cohere-python-sdk ~/.claude/skills/
 ```
-
-### Skill Format
-
-Each skill follows the [Agent Skills specification](https://docs.anthropic.com/en/docs/agent-skills):
-
-```
-my-skill/
-├── SKILL.md          # Required: instructions + metadata
-├── scripts/          # Optional: executable code
-├── references/       # Optional: documentation
-└── assets/           # Optional: templates, resources
-```
-
-SKILL.md files include YAML frontmatter:
-
-```yaml
----
-name: skill-name
-description: Brief description of the skill
----
-```
-
-## Contributing
-
-1. Create a new directory under `skills/`
-2. Add a `SKILL.md` file with frontmatter
-3. Include actionable code examples
-4. Link to official documentation
 
 ## License
 
