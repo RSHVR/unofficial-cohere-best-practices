@@ -47,7 +47,7 @@ Unofficial best practices for Cohere's AI APIs. Covers chat, embeddings, reranki
 
 | File | Topics |
 |------|--------|
-| `native-sdk.md` | Chat, streaming, tool use, structured outputs, RAG |
+| `python-sdk.md` | Chat, streaming, tool use, structured outputs, RAG |
 | `embeddings.md` | Embed v4/v3, input types, batch processing |
 | `rerank.md` | Reranking models, two-stage retrieval |
 | `streaming.md` | Event types, async patterns |

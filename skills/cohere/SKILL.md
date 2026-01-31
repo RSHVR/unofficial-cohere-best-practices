@@ -1,11 +1,11 @@
 ---
 name: unofficial-cohere-best-practices
-description: Unofficial best practices guide for Cohere's AI APIs. Use when working with Cohere models for chat/text generation (Command A, Command R+, Command R), embeddings (Embed v4, v3), reranking (Rerank v4, v3.5), streaming, structured outputs, RAG, tool use/function calling, or agents. Supports both direct Cohere Python SDK (cohere.ClientV2) and LangChain/LangGraph integrations (langchain-cohere). Triggers on mentions of Cohere API, Command models, CohereEmbeddings, ChatCohere, CohereRerank, create_cohere_react_agent, or any Cohere-related development task.
+description: Unofficial best practices guide for Cohere's AI APIs. Use when working with Cohere models for chat/text generation (Command A, Command R+, Command R), embeddings (Embed v4, v3), reranking (Rerank v4, v3.5), streaming, structured outputs, RAG, tool use/function calling, or agents. Supports Python, TypeScript, Java, and Go SDKs, plus LangChain/LangGraph integrations. Triggers on mentions of Cohere API, Command models, CohereEmbeddings, ChatCohere, CohereRerank, cohere-ai, or any Cohere-related development task.
 ---
 
-# Unofficial Cohere Agent Best Practices
+# Unofficial Cohere Best Practices
 
-This skill provides patterns and code for building agents with Cohere's AI models via the native Python SDK and LangChain/LangGraph.
+This skill provides patterns and code for building with Cohere's AI models across multiple languages: **Python**, **TypeScript**, **Java**, and **Go**, plus LangChain/LangGraph integrations.
 
 ## Prerequisites
 
@@ -56,10 +56,31 @@ response = co.chat(
 - Use `"type": "disabled"` for simple queries (lower latency)
 
 ### Installation
+
+**Python:**
 ```bash
 pip install cohere                    # Native SDK (v5+)
 pip install langchain-cohere          # LangChain integration (v0.5+)
 pip install langgraph                 # For agents
+```
+
+**TypeScript/JavaScript:**
+```bash
+npm install cohere-ai
+```
+
+**Java (Maven):**
+```xml
+<dependency>
+  <groupId>com.cohere</groupId>
+  <artifactId>cohere-java</artifactId>
+  <version>1.x.x</version>
+</dependency>
+```
+
+**Go:**
+```bash
+go get github.com/cohere-ai/cohere-go/v2
 ```
 
 ### Environment Setup
@@ -93,13 +114,23 @@ export COHERE_API_KEY="your-api-key"  # LangChain uses this
 
 Based on your use case, read the appropriate reference file:
 
-- **Native SDK (chat, streaming, tool use)**: See [references/native-sdk.md](references/native-sdk.md)
+### By Language
+- **Python SDK**: See [references/python-sdk.md](references/python-sdk.md)
+- **TypeScript SDK**: See [references/typescript-sdk.md](references/typescript-sdk.md)
+- **Java SDK**: See [references/java-sdk.md](references/java-sdk.md)
+- **Go SDK**: See [references/go-sdk.md](references/go-sdk.md)
+
+### By Feature
 - **Embeddings**: See [references/embeddings.md](references/embeddings.md)
 - **Reranking**: See [references/rerank.md](references/rerank.md)
 - **Streaming**: See [references/streaming.md](references/streaming.md)
 - **Structured Outputs**: See [references/structured-outputs.md](references/structured-outputs.md)
+
+### Python Frameworks
 - **LangChain integration**: See [references/langchain.md](references/langchain.md)
 - **LangGraph agents**: See [references/langgraph.md](references/langgraph.md)
+
+### Examples
 - **Cookbooks & Examples**: See [references/cookbooks.md](references/cookbooks.md)
 
 ## Common Patterns

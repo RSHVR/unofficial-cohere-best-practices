@@ -1,9 +1,10 @@
 # Unofficial Cohere Best Practices
 
-A Claude Code skill providing best practices for Cohere's AI APIs.
+A Claude Code skill providing best practices for Cohere's AI APIs across **Python**, **TypeScript**, **Java**, and **Go**.
 
 ## What's Included
 
+### Features
 - **Chat/Text Generation** - Command A, Command R+, Command R models
 - **Reasoning Model** - Command A Reasoning with `budget_tokens` control
 - **Vision Model** - Command A Vision for images + text
@@ -15,7 +16,11 @@ A Claude Code skill providing best practices for Cohere's AI APIs.
 - **Tool Use** - Function calling patterns
 - **Agents** - LangGraph with create_cohere_react_agent
 
-Supports both native Cohere Python SDK (`cohere.ClientV2`) and LangChain/LangGraph integrations (`langchain-cohere`).
+### Languages & Frameworks
+- **Python** - Native SDK (`cohere.ClientV2`) + LangChain/LangGraph
+- **TypeScript** - Native SDK (`cohere-ai`)
+- **Java** - Native SDK (`cohere-java`)
+- **Go** - Native SDK (`cohere-go`)
 
 ## Installation
 
@@ -56,9 +61,17 @@ Once installed, the skill activates when you mention Cohere, Command models, emb
 
 ## Reference Files
 
+### By Language
+| File | Language | Topics |
+|------|----------|--------|
+| `python-sdk.md` | Python | Chat, streaming, tool use, structured outputs, RAG |
+| `typescript-sdk.md` | TypeScript | Chat, streaming, embeddings, rerank, tool use |
+| `java-sdk.md` | Java | Chat, streaming, embeddings, rerank, tool use |
+| `go-sdk.md` | Go | Chat, streaming, embeddings, rerank, tool use |
+
+### By Feature
 | File | Topics |
 |------|--------|
-| `native-sdk.md` | Chat, streaming, tool use, structured outputs, RAG |
 | `embeddings.md` | Embed v4/v3, input types, batch processing |
 | `rerank.md` | Reranking models, two-stage retrieval |
 | `streaming.md` | Event types, async patterns |

@@ -157,7 +157,7 @@ export COHERE_API_KEY="your-api-key"  # LangChain
 
 For detailed documentation, see `skills/cohere/references/`:
 
-- **native-sdk.md** - Complete SDK reference
+- **python-sdk.md** - Complete Python SDK reference
 - **embeddings.md** - Embedding models and patterns
 - **rerank.md** - Reranking and retrieval
 - **streaming.md** - Streaming event types
