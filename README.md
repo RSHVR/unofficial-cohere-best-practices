@@ -19,9 +19,17 @@ Supports both native Cohere Python SDK (`cohere.ClientV2`) and LangChain/LangGra
 
 ## Installation
 
+**One-liner (recommended):**
+```bash
+npx skills add RSHVR/unofficial-cohere-best-practices
+```
+
+**Or via Claude Code directly:**
 ```bash
 /install RSHVR/unofficial-cohere-best-practices
 ```
+
+Works with Claude Code, Cursor, OpenCode, Codex, and [36+ other agents](https://github.com/vercel-labs/skills).
 
 ## Prerequisites
 
